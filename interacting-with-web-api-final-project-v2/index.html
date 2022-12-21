@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <title>My Calculator</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      button {
+        width: 45px;
+        margin: 2px;
+      }
+      #app {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <table>
+        <tbody>
+          <tr>
+            <td colspan="4">
+              <input type="text" id="display" />
+            </td>
+          </tr>
+          <tr>
+            <td><button class="operator" onclick="operator('AC')">AC</button></td>
+            <td><button class="operator" onclick="operator('Del')">Del</button></td>
+            <td></td>
+            <td><button class="operator" id="devide" onclick="operator('/')">/</button></td>
+          </tr>
+          <tr>
+            <td><button id="num7" onclick="number(7)">7</button></td>
+            <td><button id="num8" onclick="number(8)">8</button></td>
+            <td><button id="num9" onclick="number(9)">9</button></td>
+            <td><button class="operator" id="multiply" onclick="operator('*')">x</button></td>
+          </tr>
+          <tr>
+            <td><button id="num4" onclick="number(4)">4</button></td>
+            <td><button id="num5" onclick="number(5)">5</button></td>
+            <td><button id="num6" onclick="number(6)">6</button></td>
+            <td><button class="operator" id="minus" onclick="operator('-')">-</button></td>
+          </tr>
+          <tr>
+            <td><button id="num1" onclick="number(1)">1</button></td>
+            <td><button id="num2" onclick="number(2)">2</button></td>
+            <td><button id="num3" onclick="number(3)">3</button></td>
+            <td><button class="operator" id="plus" onclick="operator('+')">+</button></td>
+          </tr>
+          <tr>
+            <td></td>
+            <td><button id="num0" onclick="number(0)">0</button></td>
+            <td><button id="dot" onclick="operator('.')">.</button></td>
+            <td><button id="calc" onclick="calculate()">=</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      let inputNumber = [];
+      let inputOperator = [];
+      let newCounting = false;
+      let numDisplay = document.getElementById("display");
+      numDisplay.value = 0;
+
+      let output = 0;
+      let numberPreview = 0;
+      let nol = "";
+
+      function numbInp(store) {
+        inputNumber.push(numDisplay.value);
+        numDisplay.value = store;
+        console.log(inputNumber);
+      }
+      function storeOp() {
+        inputNumber.push(numDisplay.value);
+        numDisplay.value = storeOperate(inputNumber);
+        console.log(inputNumber);
+      }
+
+      const removeOperator = () => (numDisplay.value === "/" || numDisplay.value === "+" || numDisplay.value === "*" || numDisplay.value === "-" ? (numDisplay.value = "") : false);
+      const removeNol = () => (numDisplay.value === "0" ? (numDisplay.value = "") : false);
+
+      //handle when the number is pressed. It renders the number into #input element
+      function number(number) {
+        // inputNumber = number;
+        // TODO: answer here
+        if (newCounting == true) {
+          numDisplay.value = number;
+          newCounting = false;
+        } else {
+          if (numDisplay.value == 0 && number == 0) {
+            numberPreview++;
+            if (numberPreview > 1) {
+              nol += number;
+              console.log("nol", nol);
+            }
+            if (numberPreview == 3) {
+              numDisplay.value += nol;
+            } else if (numberPreview > 3) {
+              numDisplay.value += number;
+            } else {
+              numDisplay.value = number;
+            }
+          } else {
+            removeNol();
+            removeOperator();
+            numDisplay.value += number;
+          }
+        }
+        console.log(numDisplay.value);
+        console.log(inputNumber);
+      }
+
+      //handle when the Del button, AC button,dot button and other operators (+, /, -, x) are pressed. It renders the operator into #input element
+      function operator(operator) {
+        // TODO: answer here
+        if (operator === "Del") {
+          if (numDisplay.value.length == 1 || (numDisplay.value === 00 && numDisplay.value.length == 2)) {
+            numberPreview = 0;
+            console.log(numberPreview);
+            numDisplay.value = 0;
+          } else {
+            let delNumber = numDisplay.value.slice(0, -1);
+            numDisplay.value = delNumber;
+          }
+        } else if (operator === "AC") {
+          nol = "";
+          inputNumber.length = 0;
+          numberPreview = 0;
+          numDisplay.value = 0;
+        } else if (operator === ".") {
+          numDisplay.value += operator;
+        } else {
+          numbInp(operator);
+          inputNumber.push(operator);
+          console.log(inputNumber);
+        }
+      }
+
+      //handle when = button is pressed. It renders the result into #input element
+      function calculate() {
+        // TODO: answer here
+        storeOp();
+      }
+      function storeOperate(inputNumber) {
+        console.log(inputNumber);
+
+        for (let index = 0; index < inputNumber.length; index++) {
+          if (index == 0) {
+            output = parseFloat(inputNumber[index]);
+          } else {
+            if (!isNaN(inputNumber[index])) {
+              switch (inputNumber[index - 1]) {
+                case "-":
+                  output -= parseFloat(inputNumber[index]);
+                  break;
+                case "*":
+                  output *= parseFloat(inputNumber[index]);
+                  break;
+                case "+":
+                  output += parseFloat(inputNumber[index]);
+                  break;
+                case "/":
+                  output /= parseFloat(inputNumber[index]);
+                  break;
+              }
+            }
+          }
+        }
+        inputNumber.length = 0;
+        newCounting = true;
+        console.log("display", output);
+        return output;
+      }
+    </script>
+  </body>
+</html>
